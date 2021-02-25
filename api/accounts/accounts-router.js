@@ -1,6 +1,7 @@
 const router = require('express').Router();
 const dbConfig = require('../../data/db-config');
 const accountsModel = require('./accounts-model');
+const { checkAccountId, checkAccountPayload, checkAccountNameUnique } = require('./accounts-middleware');
 
 router.get('/', async (req, res, next) => {
 	// DO YOUR MAGIC
@@ -12,7 +13,7 @@ router.get('/', async (req, res, next) => {
 	}
 });
 
-router.get('/:id', async (req, res, next) => {
+router.get('/:id', checkAccountId(), async (req, res, next) => {
 	// DO YOUR MAGIC
 	try {
 		const account = await accountsModel.getById(req.params.id);
@@ -22,34 +23,8 @@ router.get('/:id', async (req, res, next) => {
 	}
 });
 
-router.post('/', async (req, res, next) => {
+router.post('/', checkAccountPayload(), checkAccountNameUnique(), async (req, res, next) => {
 	// DO YOUR MAGIC
-	if (req.body.name === undefined || req.body.budget === undefined) {
-		return res.status(400).json({
-			message: 'name and budget required.'
-		});
-	}
-	if (typeof req.body.name !== 'string' || req.body.name === 0) {
-		return res.status(400).json({
-			message: 'Name of account must be a string.'
-		});
-	}
-	if (req.body.name.length < 3) {
-		return res.status(400).json({
-			message: 'Name of account must be between 3 and 100.'
-		});
-	}
-	if (typeof req.body.budget === 'string') {
-		return res.status(400).json({
-			message: 'Budget of account must be a number.'
-		});
-	}
-	if (req.body.budget < 0 || req.body.budget > 1000000) {
-		return res.status(400).json({
-			message: 'Budget of account is too large or too small.'
-		});
-	}
-
 	try {
 		const account = await accountsModel.create(req.body);
 		res.status(201).json(account);
@@ -58,34 +33,8 @@ router.post('/', async (req, res, next) => {
 	}
 });
 
-router.put('/:id', async (req, res, next) => {
+router.put('/:id', checkAccountPayload(), checkAccountId(), async (req, res, next) => {
 	// DO YOUR MAGIC
-	if (req.body.name === undefined || req.body.budget === undefined) {
-		return res.status(400).json({
-			message: 'name and budget required.'
-		});
-	}
-	if (typeof req.body.name !== 'string' || req.body.name === 0) {
-		return res.status(400).json({
-			message: 'Name of account must be a string.'
-		});
-	}
-	if (req.body.name.length < 3) {
-		return res.status(400).json({
-			message: 'Name of account must be between 3 and 100.'
-		});
-	}
-	if (typeof req.body.budget === 'string') {
-		return res.status(400).json({
-			message: 'Budget of account must be a number.'
-		});
-	}
-	if (req.body.budget < 0 || req.body.budget > 1000000) {
-		return res.status(400).json({
-			message: 'Budget of account is too large or too small.'
-		});
-	}
-
 	try {
 		const account = await accountsModel.updateById(req.params.id, req.body);
 		res.status(200).json(account);
