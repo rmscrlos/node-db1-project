@@ -1,22 +1,40 @@
 const router = require('express').Router();
-const accountModel = require('./accounts-model');
+const accountsModel = require('./accounts-model');
 
 router.get('/', async (req, res, next) => {
 	// DO YOUR MAGIC
 	try {
-		const accounts = await accountModel.getAll();
+		const accounts = await accountsModel.getAll();
 		res.json(accounts);
 	} catch (err) {
 		next(err);
 	}
 });
 
-router.get('/:id', (req, res, next) => {
+router.get('/:id', async (req, res, next) => {
 	// DO YOUR MAGIC
+	try {
+		const account = await accountsModel.getById(req.params.id);
+		res.status(200).json(account);
+	} catch (err) {
+		next(err);
+	}
 });
 
-router.post('/', (req, res, next) => {
+router.post('/', async (req, res, next) => {
 	// DO YOUR MAGIC
+	if (!req.body.name || !req.body.budget) {
+		return res.status(400).json({
+			message: 'name and budget required.'
+		});
+	}
+
+	try {
+		const account = await accountsModel.create(req.body);
+		res.status(201).json(account);
+	} catch (err) {
+		next(err);
+	}
 });
 
 router.put('/:id', (req, res, next) => {
