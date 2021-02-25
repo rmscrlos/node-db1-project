@@ -1,5 +1,4 @@
 const router = require('express').Router();
-const dbConfig = require('../../data/db-config');
 const accountsModel = require('./accounts-model');
 const { checkAccountId, checkAccountPayload, checkAccountNameUnique } = require('./accounts-middleware');
 
