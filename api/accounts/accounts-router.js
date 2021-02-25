@@ -1,4 +1,5 @@
 const router = require('express').Router();
+const dbConfig = require('../../data/db-config');
 const accountsModel = require('./accounts-model');
 
 router.get('/', async (req, res, next) => {
@@ -37,8 +38,20 @@ router.post('/', async (req, res, next) => {
 	}
 });
 
-router.put('/:id', (req, res, next) => {
+router.put('/:id', async (req, res, next) => {
 	// DO YOUR MAGIC
+	if (!req.body.name || !req.body.budget) {
+		return res.status(400).json({
+			message: 'name and budget required.'
+		});
+	}
+
+	try {
+		const account = await accountsModel.updateById(req.params.id, req.body);
+		res.status(200).json(account);
+	} catch (err) {
+		next(err);
+	}
 });
 
 router.delete('/:id', (req, res, next) => {
